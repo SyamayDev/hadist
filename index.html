@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
+        /* [CSS Anda tetap sama seperti sebelumnya, tidak ada perubahan di sini untuk menghemat ruang] */
         /* Global Base */
         body {
             margin: 0;
@@ -624,10 +625,36 @@
                     });
                 },
                 shareHadith(platform, hadith) {
-                    let text = `${hadith.arab}\n\n${hadith.id}\n\n(Dibagikan dari Hadits Digital)`;
-                    if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                    else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://hadith-digital.example.com')}?quote=${encodeURIComponent(text)}`, '_blank');
-                    else if (platform === 'instagram') window.open('https://instagram.com/', '_blank');
+                    // Buat teks yang akan dibagikan
+                    let text = `Hadits ${hadith.number} (${hadith.bookName})\n\n${hadith.arab}\n\n${hadith.id}\n\n(Dibagikan dari Hadits Digital)`;
+                    const maxLength = 1500; // Batas aman untuk URL
+                    if (text.length > maxLength) {
+                        text = text.substring(0, maxLength - 3) + '...';
+                    }
+                    const encodedText = encodeURIComponent(text);
+                    const siteUrl = encodeURIComponent('https://hadith-digital.example.com'); // Ganti dengan URL situs Anda
+
+                    if (platform === 'whatsapp') {
+                        const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+                        const newWindow = window.open(whatsappUrl, '_blank');
+                        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                            alert('Gagal membuka WhatsApp. Teks telah disalin ke clipboard:\n\n' + text);
+                            navigator.clipboard.writeText(text);
+                        }
+                    } else if (platform === 'facebook') {
+                        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}&quote=${encodedText}`;
+                        const newWindow = window.open(facebookUrl, '_blank');
+                        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                            alert('Gagal membuka Facebook. Teks telah disalin ke clipboard:\n\n' + text);
+                            navigator.clipboard.writeText(text);
+                        }
+                    } else if (platform === 'instagram') {
+                        // Instagram tidak mendukung share langsung via URL, jadi salin teks dan arahkan ke Instagram
+                        navigator.clipboard.writeText(text).then(() => {
+                            alert('Instagram tidak mendukung berbagi langsung. Teks telah disalin ke clipboard untuk Anda posting:\n\n' + text);
+                            window.open('https://www.instagram.com/', '_blank');
+                        });
+                    }
                 },
                 toggleSaveHadith(hadith) {
                     const key = `${hadith.bookId}-${hadith.number}`;

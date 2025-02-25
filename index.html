@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="Description" content="Hadits Online Dengan Terjemahan Bahasa Indonesia (api.hadith.gading.dev)">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <!-- Google Font untuk teks Arab (Lateef) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lateef&display=swap">
+    <!-- Animate.css untuk animasi -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        /* Global Base */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #f0f4f8, #e0e7ff);
+            color: #212529;
+            font-family: 'Roboto', sans-serif;
+            transition: background 0.5s ease, color 0.3s ease;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background: linear-gradient(45deg, #f0f4f8, #e0e7ff); }
+            25% { background: linear-gradient(45deg, #e0e7ff, #d1e3ff); }
+            50% { background: linear-gradient(45deg, #d1e3ff, #e0e7ff); }
+            75% { background: linear-gradient(45deg, #e0e7ff, #f0f4f8); }
+            100% { background: linear-gradient(45deg, #f0f4f8, #e0e7ff); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            animation: navbarPulse 5s ease infinite;
+        }
+        @keyframes navbarPulse {
+            0% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); }
+            100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        }
+        .navbar-brand {
+            font-size: 2rem;
+            font-family: 'Lateef', serif;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .navbar-brand:hover {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 10px solid #f3f3f3;
+            border-top: 10px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite, pulseSpinner 1.5s ease infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulseSpinner {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Card & Modal */
+        .card, .modal-content {
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .card:hover, .modal-content:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+        .card-header, .modal-header {
+            border-radius: 15px 15px 0 0;
+            background: linear-gradient(45deg, #28a745, #34c759);
+            color: #fff;
+            animation: headerGradient 10s ease infinite;
+        }
+        @keyframes headerGradient {
+            0% { background: linear-gradient(45deg, #28a745, #34c759); }
+            50% { background: linear-gradient(45deg, #34c759, #28a745); }
+            100% { background: linear-gradient(45deg, #28a745, #34c759); }
+        }
+
+        /* Book List */
+        .book-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .book-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        .book-card:hover {
+            background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.553);
+        }
+        .book-card .book-name {
+            font-size: 1.5rem;
+            color: #28a745;
+            transition: color 0.3s ease;
+        }
+        .book-card:hover .book-name {
+            color: #1e7e34;
+        }
+        .book-card .book-info {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* Search Container */
+        .search-container {
+            position: relative;
+            margin-bottom: 25px;
+            animation: searchFadeIn 1s ease;
+        }
+        @keyframes searchFadeIn {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        #bookSearch, #hadithSearch {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #28a745;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        #bookSearch:focus, #hadithSearch:focus {
+            border-color: #1e7e34;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+            transform: scale(1.02);
+            outline: none;
+        }
+        .voice-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #28a745;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+        .voice-search-btn:hover {
+            background: #1e7e34;
+            transform: translateY(-50%) rotate(360deg);
+        }
+
+        /* Voice Popup */
+        .voice-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            text-align: center;
+            pointer-events: none;
+        }
+        .voice-popup p {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #28a745;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            align-items: center;
+        }
+        .pagination button {
+            padding: 10px 15px;
+            border: 2px solid #28a745;
+            border-radius: 25px;
+            background: #fff;
+            color: #28a745;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pagination button:hover {
+            background: #28a745;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .pagination button:disabled {
+            background: #e9ecef;
+            border-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .pagination .page-number {
+            padding: 8px 16px;
+            border: 2px solid #28a745;
+            border-radius: 25px;
+            background: #fff;
+            color: #28a745;
+            font-weight: 500;
+            transition: background 0.3s ease, color 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        .pagination .page-number:hover {
+            background: #28a745;
+            color: #fff;
+        }
+        .pagination .page-number select {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #28a745;
+            border-radius: 25px;
+            background: #fff;
+            color: #28a745;
+        }
+
+        /* Hadith Text */
+        .arabic-text {
+            font-family: 'Lateef', serif;
+            font-size: 1.5rem;
+            direction: rtl;
+            text-align: right;
+            color: #28a745;
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(45deg, #121212, #1e1e1e) !important;
+                color: #e9ecef !important;
+                animation: darkGradientBG 15s ease infinite;
+            }
+            @keyframes darkGradientBG {
+                0% { background: linear-gradient(45deg, #121212, #1e1e1e); }
+                25% { background: linear-gradient(45deg, #1e1e1e, #2d2d2d); }
+                50% { background: linear-gradient(45deg, #2d2d2d, #1e1e1e); }
+                75% { background: linear-gradient(45deg, #1e1e1e, #121212); }
+                100% { background: linear-gradient(45deg, #121212, #1e1e1e); }
+            }
+            .navbar {
+                background: linear-gradient(45deg, #1c7c54, #145f3f) !important;
+            }
+            .card, .modal-content {
+                background: rgba(30, 30, 30, 0.977) !important;
+                color: #e9ecef !important;
+            }
+            .card-header, .modal-header {
+                background: linear-gradient(45deg, #1c7c54, #34c759) !important;
+            }
+            .book-card {
+                background: linear-gradient(135deg, #2d2d2d, #1e1e1e);
+            }
+            .book-card:hover {
+                background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            }
+            .book-card .book-name { color: #80ffa7; }
+            .book-card .book-info { color: #b0b0b0; }
+            #bookSearch, #hadithSearch {
+                background: #2d2d2d;
+                border-color: #666;
+                color: #e9ecef;
+            }
+            .voice-search-btn { background: #1c7c54; }
+            .voice-search-btn:hover { background: #145f3f; }
+            .pagination button { background: #2d2d2d; border-color: #666; color: #e9ecef; }
+            .pagination button:hover { background: #1c7c54; color: #fff; }
+            .pagination .page-number {
+                background: #2d2d2d;
+                border-color: #666;
+                color: #e9ecef;
+            }
+            .pagination .page-number:hover {
+                background: #1c7c54;
+                color: #fff;
+            }
+            .pagination select { background: #2d2d2d; border-color: #666; color: #e9ecef; }
+            .voice-popup { background: rgba(30, 30, 30, 0.95); color: #80ffa7; }
+            .arabic-text { color: #80ffa7; }
+            .select2-container--default .select2-selection--single {
+                background-color: #1e1e1e !important;
+                color: #e9ecef !important;
+                border: 1px solid #666 !important;
+            }
+            .select2-container--default .select2-selection__rendered { color: #e9ecef !important; }
+            .select2-container--default .select2-results__option--selectable {
+                background-color: #1e1e1e !important;
+                color: #e9ecef !important;
+            }
+            .select2-container--default .select2-results__option--highlighted[aria-selected] {
+                background-color: #333 !important;
+                color: #e9ecef !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .navbar-brand { font-size: 1.5rem; }
+            .book-list { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .voice-popup { width: 90%; }
+        }
+
+        /* Pastikan tidak ada backdrop yang mengganggu */
+        .modal-backdrop {
+            display: none !important;
+        }
+    </style>
+
+    <title>Hadits Digital</title>
+</head>
+<body>
+    <div id="app" class="animate__animated animate__fadeIn">
+        <!-- Navbar -->
+        <nav class="navbar navbar-dark">
+            <a class="navbar-brand animate__animated animate__pulse animate__infinite" href="#">Hadits Digital</a>
+        </nav>
+
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card my-5 border-0 shadow animate__animated animate__zoomIn">
+                        <div class="card-header my-card-header d-flex justify-content-between align-items-center">
+                            <span class="animate__animated animate__fadeInLeft">Daftar Kitab Hadits</span>
+                            <div>
+                                <button class="btn btn-outline-light btn-sm animate__animated animate__rotateIn mr-2" @click="refreshPage">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                                <button class="btn btn-outline-light btn-sm" @click="showSavedHadithsModal" title="Hadits Tersimpan ({{ savedHadiths.length }})">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-container">
+                                <input type="text" id="bookSearch" v-model="searchQuery" placeholder="Cari kitab..." @input="filterBooks">
+                                <button class="voice-search-btn" @click="startVoiceSearch"><i class="fas fa-microphone"></i></button>
+                            </div>
+                            <div v-if="loading" class="d-flex justify-content-center">
+                                <div class="spinner"></div>
+                            </div>
+                            <div v-else-if="paginatedBooks.length === 0" class="text-center">
+                                <p>Tidak ada kitab yang ditemukan。</p>
+                            </div>
+                            <div v-else class="book-list">
+                                <div v-for="book in paginatedBooks" :key="book.id" class="book-card" @click="openDetailModal(book.id)">
+                                    <div class="book-name">{{ book.name }}</div>
+                                    <div class="book-info">{{ book.numberOfHadith }} Hadits</div>
+                                </div>
+                            </div>
+                            <div class="pagination" v-if="totalPages > 1">
+                                <button :disabled="currentPage === 1" @click="previousPage" class="animate__animated animate__fadeInLeft">Previous</button>
+                                <span class="page-number">{{ currentPage }} / {{ totalPages }}</span>
+                                <button :disabled="currentPage === totalPages" @click="nextPage" class="animate__animated animate__fadeInRight">Next</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Detail Kitab -->
+                    <div class="modal fade" id="detailModal" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content my-modal-content animate__animated animate__zoomIn">
+                                <div class="modal-header my-modal-header">
+                                    <h5 class="modal-title">{{ selectedBook.name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div v-if="loading2" class="d-flex justify-content-center">
+                                        <div class="spinner"></div>
+                                    </div>
+                                    <div v-else-if="hadiths.length === 0" class="text-center">
+                                        <p>Tidak ada hadits yang tersedia untuk kitab ini。</p>
+                                    </div>
+                                    <div v-else>
+                                        <div class="mb-3">
+                                            <select id="hadithSelect" style="width: 100%;"></select>
+                                        </div>
+                                        <div class="border border-success p-3" style="max-height: 450px; overflow-y: scroll; border-radius: 8px;">
+                                            <div v-for="(hadith, idx) in hadiths" :key="hadith.number" :id="'hadith-' + hadith.number" class="animate__animated animate__fadeInUp">
+                                                <p><span class="badge badge-pill badge-success">Hadits {{ hadith.number }}</span></p>
+                                                <p class="arabic-text">{{ hadith.arab }}</p>
+                                                <p><small class="font-italic">{{ hadith.id }}</small></p>
+                                                <div class="mt-2">
+                                                    <button class="btn btn-sm btn-outline-secondary animate__animated animate__pulse animate__infinite" @click="copyHadith(hadith)">
+                                                        <i v-if="copiedHadiths[hadith.number]" class="fas fa-check copied-check"></i>
+                                                        <i v-else class="fas fa-copy"></i> Salin
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-primary ml-2" @click="toggleSaveHadith(hadith)">
+                                                        <i v-if="isHadithSaved(hadith)" class="fas fa-save"></i>
+                                                        <i v-else class="far fa-save"></i> {{ isHadithSaved(hadith) ? 'Hapus' : 'Simpan' }}
+                                                    </button>
+                                                    <div class="btn-group ml-2">
+                                                        <button class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown">Bagikan</button>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item" href="#" @click.prevent="shareHadith('whatsapp', hadith)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                                                            <a class="dropdown-item" href="#" @click.prevent="shareHadith('facebook', hadith)"><i class="fab fa-facebook-f"></i> Facebook</a>
+                                                            <a class="dropdown-item" href="#" @click.prevent="shareHadith('instagram', hadith)"><i class="fab fa-instagram"></i> Instagram</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                            </div>
+                                        </div>
+                                        <div class="pagination" v-if="totalHadithPages > 1">
+                                            <button :disabled="currentHadithPage === 1" @click="previousHadithPage" class="animate__animated animate__fadeInLeft">Previous</button>
+                                            <div class="page-number" @click="togglePageSelect">
+                                                {{ currentHadithPage }} / {{ totalHadithPages }}
+                                                <select v-if="showPageSelect" v-model="currentHadithPage" @change="jumpToHadithPage" @blur="showPageSelect = false" style="position: absolute; opacity: 0; width: 100%;">
+                                                    <option v-for="page in totalHadithPages" :key="page" :value="page">{{ page }}</option>
+                                                </select>
+                                            </div>
+                                            <button :disabled="currentHadithPage === totalHadithPages" @click="nextHadithPage" class="animate__animated animate__fadeInRight">Next</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Hadits Tersimpan -->
+                    <div class="modal fade" id="savedHadithsModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content my-modal-content animate__animated animate__zoomIn">
+                                <div class="modal-header my-modal-header">
+                                    <h5 class="modal-title">Hadits Tersimpan</h5>
+                                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div v-if="savedHadiths.length === 0" class="text-center">
+                                        <p>Belum ada hadits yang disimpan.</p>
+                                    </div>
+                                    <div v-else>
+                                        <div v-for="hadith in savedHadiths" :key="hadith.number" class="mb-3">
+                                            <p><span class="badge badge-pill badge-success">Hadits {{ hadith.number }} ({{ hadith.bookName }})</span></p>
+                                            <p class="arabic-text">{{ hadith.arab }}</p>
+                                            <p><small class="font-italic">{{ hadith.id }}</small></p>
+                                            <button class="btn btn-sm btn-primary" @click="goToSavedHadith(hadith)">Lihat</button>
+                                            <button class="btn btn-sm btn-danger ml-2" @click="toggleSaveHadith(hadith)">Hapus</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Search Popup -->
+        <div v-if="showVoicePopup" class="voice-popup" id="voicePopup">
+            <p>{{ voiceText }}</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                allBooks: [],
+                selectedBook: {},
+                hadiths: [],
+                loading: false,
+                loading2: false,
+                copiedHadiths: {},
+                savedHadiths: [],
+                searchQuery: '',
+                currentPage: 1,
+                itemsPerPage: 12,
+                showVoicePopup: false,
+                voiceText: '',
+                currentHadithPage: 1,
+                hadithsPerPage: 100,
+                totalHadiths: 0,
+                hadithSearchQuery: '',
+                showPageSelect: false
+            },
+            computed: {
+                filteredBooks() {
+                    let filtered = this.allBooks;
+                    if (this.searchQuery) {
+                        const query = this.searchQuery.toLowerCase().replace(/[\s-]/g, '');
+                        filtered = filtered.filter(b => b.name.toLowerCase().replace(/[\s-]/g, '').includes(query));
+                    }
+                    return filtered;
+                },
+                totalPages() { return Math.ceil(this.filteredBooks.length / this.itemsPerPage); },
+                paginatedBooks() {
+                    const start = (this.currentPage - 1) * this.itemsPerPage;
+                    const end = start + this.itemsPerPage;
+                    return this.filteredBooks.slice(start, end);
+                },
+                totalHadithPages() { return Math.ceil(this.totalHadiths / this.hadithsPerPage); }
+            },
+            methods: {
+                refreshPage() { window.location.reload(); },
+                getBooks() {
+                    this.loading = true;
+                    this.$http.get('https://api.hadith.gading.dev/books').then(response => {
+                        this.allBooks = response.body.data.map(book => ({
+                            id: book.id,
+                            name: book.name,
+                            numberOfHadith: book.available
+                        }));
+                        this.loading = false;
+                    }).catch(err => {
+                        console.error('Error fetching books:', err);
+                        this.loading = false;
+                        alert('Gagal memuat daftar kitab. Silakan coba lagi.');
+                    });
+                },
+                getHadiths(bookId, page = 1) {
+                    this.loading2 = true;
+                    const start = (page - 1) * this.hadithsPerPage + 1;
+                    const end = Math.min(start + this.hadithsPerPage - 1, this.selectedBook.numberOfHadith);
+                    const range = `${start}-${end}`;
+                    
+                    this.$http.get(`https://api.hadith.gading.dev/books/${bookId}?range=${range}`).then(response => {
+                        this.hadiths = response.body.data.hadiths.map((h, index) => ({
+                            number: start + index,
+                            arab: h.arab,
+                            id: h.id,
+                            bookId: bookId,
+                            bookName: this.selectedBook.name
+                        }));
+                        this.totalHadiths = this.selectedBook.numberOfHadith;
+                        this.currentHadithPage = page;
+                        this.loading2 = false;
+                        this.$nextTick(() => this.initSelect2());
+                    }).catch(err => {
+                        console.error('Error fetching hadiths:', err);
+                        this.loading2 = false;
+                        alert('Gagal memuat hadits. Silakan coba lagi.');
+                    });
+                },
+                openDetailModal(bookId) {
+                    this.selectedBook = this.allBooks.find(b => b.id === bookId) || {};
+                    this.getHadiths(bookId, 1);
+                    $('#detailModal').modal('show');
+                },
+                initSelect2() {
+                    $('#hadithSelect').select2({
+                        placeholder: 'Pilih hadits...',
+                        allowClear: true,
+                        data: this.hadiths.map(h => ({ id: h.number, text: `Hadits ${h.number}: ${h.arab.substring(0, 20)}...` }))
+                    });
+                    $('#hadithSelect').on('change', () => {
+                        let val = $('#hadithSelect').val();
+                        if (val) document.getElementById(`hadith-${val}`).scrollIntoView({ behavior: "smooth", block: "start" });
+                    });
+                },
+                previousHadithPage() {
+                    if (this.currentHadithPage > 1) {
+                        this.getHadiths(this.selectedBook.id, this.currentHadithPage - 1);
+                    }
+                },
+                nextHadithPage() {
+                    if (this.currentHadithPage < this.totalHadithPages) {
+                        this.getHadiths(this.selectedBook.id, this.currentHadithPage + 1);
+                    }
+                },
+                jumpToHadithPage() {
+                    this.getHadiths(this.selectedBook.id, this.currentHadithPage);
+                },
+                togglePageSelect() {
+                    this.showPageSelect = true;
+                    this.$nextTick(() => document.querySelector('.page-number select').focus());
+                },
+                copyHadith(hadith) {
+                    let text = `Hadits ${hadith.number}\nArab: ${hadith.arab}\nTerjemahan: ${hadith.id}`;
+                    navigator.clipboard.writeText(text).then(() => {
+                        this.$set(this.copiedHadiths, hadith.number, true);
+                        setTimeout(() => this.$delete(this.copiedHadiths, hadith.number), 1000);
+                    });
+                },
+                shareHadith(platform, hadith) {
+                    let text = `${hadith.arab}\n\n${hadith.id}\n\n(Dibagikan dari Hadits Digital)`;
+                    if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                    else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://hadith-digital.example.com')}?quote=${encodeURIComponent(text)}`, '_blank');
+                    else if (platform === 'instagram') window.open('https://instagram.com/', '_blank');
+                },
+                toggleSaveHadith(hadith) {
+                    const key = `${hadith.bookId}-${hadith.number}`;
+                    const index = this.savedHadiths.findIndex(h => `${h.bookId}-${h.number}` === key);
+                    if (index >= 0) {
+                        this.savedHadiths.splice(index, 1);
+                    } else {
+                        this.savedHadiths.push({
+                            bookId: hadith.bookId,
+                            bookName: hadith.bookName,
+                            number: hadith.number,
+                            arab: hadith.arab,
+                            id: hadith.id
+                        });
+                    }
+                    this.saveHadiths();
+                },
+                isHadithSaved(hadith) {
+                    return this.savedHadiths.some(h => h.bookId === hadith.bookId && h.number === hadith.number);
+                },
+                showSavedHadithsModal() {
+                    $('#savedHadithsModal').modal('show');
+                },
+                goToSavedHadith(hadith) {
+                    $('#savedHadithsModal').modal('hide');
+                    this.openDetailModal(hadith.bookId);
+                    this.$nextTick(() => {
+                        setTimeout(() => {
+                            const page = Math.ceil(hadith.number / this.hadithsPerPage);
+                            this.getHadiths(hadith.bookId, page);
+                            setTimeout(() => {
+                                const el = document.getElementById(`hadith-${hadith.number}`);
+                                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }, 500);
+                        }, 500);
+                    });
+                },
+                searchHadith() {
+                    const query = parseInt(this.hadithSearchQuery);
+                    if (isNaN(query) || query < 1 || query > this.totalHadiths) {
+                        alert('Masukkan nomor hadits yang valid.');
+                        return;
+                    }
+                    const page = Math.ceil(query / this.hadithsPerPage);
+                    this.getHadiths(this.selectedBook.id, page);
+                    this.$nextTick(() => {
+                        setTimeout(() => {
+                            const el = document.getElementById(`hadith-${query}`);
+                            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }, 500);
+                    });
+                },
+                filterBooks() { this.currentPage = 1; },
+                previousPage() { if (this.currentPage > 1) this.currentPage--; },
+                nextPage() { if (this.currentPage < this.totalPages) this.currentPage++; },
+                startVoiceSearch() {
+                    if (!('webkitSpeechRecognition' in window)) {
+                        alert('Browser Anda tidak mendukung fitur pencarian suara.');
+                        return;
+                    }
+                    const recognition = new webkitSpeechRecognition();
+                    recognition.lang = 'id-ID';
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+
+                    this.showVoicePopup = true;
+                    this.voiceText = 'Mendengarkan...';
+                    document.body.classList.remove('modal-open');
+                    if (document.querySelector('.modal-backdrop')) {
+                        document.querySelector('.modal-backdrop').remove();
+                    }
+
+                    recognition.onresult = (event) => {
+                        const interimTranscript = Array.from(event.results)
+                            .map(result => result[0].transcript)
+                            .join('');
+                        this.voiceText = interimTranscript || 'Mendengarkan...';
+                        if (event.results[0].isFinal) {
+                            this.searchQuery = event.results[0][0].transcript;
+                            this.filterBooks();
+                            setTimeout(() => { this.showVoicePopup = false; }, 1000);
+                        }
+                    };
+                    recognition.onend = () => {
+                        if (this.voiceText === 'Mendengarkan...') {
+                            this.voiceText = 'Tidak ada suara terdeteksi';
+                            setTimeout(() => { this.showVoicePopup = false; }, 1000);
+                        }
+                    };
+                    recognition.onerror = (event) => {
+                        this.voiceText = 'Error: ' + event.error;
+                        setTimeout(() => { this.showVoicePopup = false; }, 1000);
+                        console.error('Voice recognition error:', event.error);
+                    };
+                    recognition.start();
+                },
+                loadSavedHadiths() {
+                    const saved = localStorage.getItem('savedHadiths');
+                    if (saved) this.savedHadiths = JSON.parse(saved);
+                },
+                saveHadiths() {
+                    localStorage.setItem('savedHadiths', JSON.stringify(this.savedHadiths));
+                }
+            },
+            mounted() {
+                this.loadSavedHadiths();
+                this.getBooks();
+                $('#detailModal').on('hidden.bs.modal', () => {
+                    this.hadiths = [];
+                    this.selectedBook = {};
+                    this.currentHadithPage = 1;
+                    this.totalHadiths = 0;
+                    this.hadithSearchQuery = '';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

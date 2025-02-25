@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
-        /* [CSS Anda tetap sama seperti sebelumnya, tidak ada perubahan di sini untuk menghemat ruang] */
         /* Global Base */
         body {
             margin: 0;
@@ -51,7 +50,7 @@
             100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
         }
         .navbar-brand {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-family: 'Lateef', serif;
             color: #fff;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
@@ -105,7 +104,7 @@
         /* Book List */
         .book-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Default: fleksibel untuk desktop */
             gap: 20px;
             padding: 20px;
         }
@@ -333,11 +332,20 @@
             }
         }
 
-        /* Responsive */
+        /* Responsive Adjustments */
         @media (max-width: 767px) {
-            .navbar-brand { font-size: 1.5rem; }
-            .book-list { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .navbar-brand { font-size: 2rem; }
+            .book-list {
+                grid-template-columns: 1fr; /* Satu kolom untuk mobile */
+                gap: 15px;
+            }
             .voice-popup { width: 90%; }
+        }
+
+        @media (min-width: 768px) {
+            .book-list {
+                grid-template-columns: repeat(3, 1fr); /* Tiga kolom untuk desktop */
+            }
         }
 
         /* Pastikan tidak ada backdrop yang mengganggu */
@@ -346,13 +354,13 @@
         }
     </style>
 
-    <title>Hadits Digital</title>
+    <title>Hadist Digital</title>
 </head>
 <body>
     <div id="app" class="animate__animated animate__fadeIn">
         <!-- Navbar -->
         <nav class="navbar navbar-dark">
-            <a class="navbar-brand animate__animated animate__pulse animate__infinite" href="#">Hadits Digital</a>
+            <a class="navbar-brand animate__animated animate__pulse animate__infinite" href="index.html">Hadist Digital</a>
         </nav>
 
         <div class="container mt-4">
@@ -625,14 +633,13 @@
                     });
                 },
                 shareHadith(platform, hadith) {
-                    // Buat teks yang akan dibagikan
                     let text = `Hadits ${hadith.number} (${hadith.bookName})\n\n${hadith.arab}\n\n${hadith.id}\n\n(Dibagikan dari Hadits Digital)`;
-                    const maxLength = 1500; // Batas aman untuk URL
+                    const maxLength = 1500;
                     if (text.length > maxLength) {
                         text = text.substring(0, maxLength - 3) + '...';
                     }
                     const encodedText = encodeURIComponent(text);
-                    const siteUrl = encodeURIComponent('https://hadith-digital.example.com'); // Ganti dengan URL situs Anda
+                    const siteUrl = encodeURIComponent('https://hadith-digital.example.com');
 
                     if (platform === 'whatsapp') {
                         const whatsappUrl = `https://wa.me/?text=${encodedText}`;
@@ -649,7 +656,6 @@
                             navigator.clipboard.writeText(text);
                         }
                     } else if (platform === 'instagram') {
-                        // Instagram tidak mendukung share langsung via URL, jadi salin teks dan arahkan ke Instagram
                         navigator.clipboard.writeText(text).then(() => {
                             alert('Instagram tidak mendukung berbagi langsung. Teks telah disalin ke clipboard untuk Anda posting:\n\n' + text);
                             window.open('https://www.instagram.com/', '_blank');

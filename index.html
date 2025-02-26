@@ -102,13 +102,13 @@
                                                         <i v-if="isHadithSaved(hadith)" class="fas fa-save"></i>
                                                         <i v-else class="far fa-save"></i> {{ isHadithSaved(hadith) ? 'Hapus' : 'Simpan' }}
                                                     </button>
-                                                    <div class="btn-group ml-2">
-                                                        <button class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown">Bagikan</button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item" href="#" @click.prevent="shareHadith('whatsapp', hadith)"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                                                            <a class="dropdown-item" href="#" @click.prevent="shareHadith('facebook', hadith)"><i class="fab fa-facebook-f"></i> Facebook</a>
-                                                            <a class="dropdown-item" href="#" @click.prevent="shareHadith('instagram', hadith)"><i class="fab fa-instagram"></i> Instagram</a>
-                                                        </div>
+                                                    <button class="btn btn-sm btn-success ml-2" @click="shareHadith(hadith)">Bagikan</button>
+                                                    <div class="share-options" v-if="showShareOptions[hadith.number]">
+                                                        <p>Bagikan melalui:</p>
+                                                        <a :href="`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText[hadith.number])}`" target="_blank">WhatsApp</a>
+                                                        <a :href="`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://hadith-digital.example.com')}&quote=${encodeURIComponent(shareText[hadith.number])}`" target="_blank">Facebook</a>
+                                                        <a href="https://www.instagram.com/" target="_blank">Instagram</a>
+                                                        <a href="#" @click.prevent="copyShareText(hadith.number)">Salin Teks</a>
                                                     </div>
                                                 </div>
                                                 <hr>
@@ -178,6 +178,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>

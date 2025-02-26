@@ -1,3 +1,4 @@
+
 var app = new Vue({
     el: '#app',
     data: {
@@ -17,7 +18,9 @@ var app = new Vue({
         hadithsPerPage: 100,
         totalHadiths: 0,
         hadithSearchQuery: '',
-        showPageSelect: false
+        showPageSelect: false,
+        showShareOptions: {}, // Objek untuk mengontrol visibilitas opsi share per hadits
+        shareText: {} // Objek untuk menyimpan teks share per hadits
     },
     computed: {
         filteredBooks() {
@@ -117,35 +120,30 @@ var app = new Vue({
                 setTimeout(() => this.$delete(this.copiedHadiths, hadith.number), 1000);
             });
         },
-        shareHadith(platform, hadith) {
-            let text = `Hadits ${hadith.number} (${hadith.bookName})\n\n${hadith.arab}\n\n${hadith.id}\n\n(Dibagikan dari Hadits Digital)`;
-            const maxLength = 1500;
-            if (text.length > maxLength) {
-                text = text.substring(0, maxLength - 3) + '...';
-            }
-            const encodedText = encodeURIComponent(text);
-            const siteUrl = encodeURIComponent('https://hadith-digital.example.com');
-
-            if (platform === 'whatsapp') {
-                const whatsappUrl = `https://wa.me/?text=${encodedText}`;
-                const newWindow = window.open(whatsappUrl, '_blank');
-                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                    alert('Gagal membuka WhatsApp. Teks telah disalin ke clipboard:\n\n' + text);
-                    navigator.clipboard.writeText(text);
-                }
-            } else if (platform === 'facebook') {
-                const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}&quote=${encodedText}`;
-                const newWindow = window.open(facebookUrl, '_blank');
-                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                    alert('Gagal membuka Facebook. Teks telah disalin ke clipboard:\n\n' + text);
-                    navigator.clipboard.writeText(text);
-                }
-            } else if (platform === 'instagram') {
-                navigator.clipboard.writeText(text).then(() => {
-                    alert('Instagram tidak mendukung berbagi langsung. Teks telah disalin ke clipboard untuk Anda posting:\n\n' + text);
-                    window.open('https://www.instagram.com/', '_blank');
+        shareHadith(hadith) {
+            const shareText = `Hadits ${hadith.number} (${hadith.bookName})\n\nArab: ${hadith.arab}\n\nTerjemahan: ${hadith.id}\n\n(Dibagikan dari Hadist Digital)`;
+            this.$set(this.shareText, hadith.number, shareText);
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `Hadits ${hadith.number} (${hadith.bookName})`,
+                    text: shareText
+                }).then(() => {
+                    console.log('Hadits berhasil dibagikan');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                    this.$set(this.showShareOptions, hadith.number, true);
                 });
+            } else {
+                this.$set(this.showShareOptions, hadith.number, true);
             }
+        },
+        copyShareText(hadithNumber) {
+            navigator.clipboard.writeText(this.shareText[hadithNumber]).then(() => {
+                alert('Teks hadits telah disalin ke clipboard.');
+            }).catch(err => {
+                console.error('Gagal menyalin teks:', err);
+            });
         },
         toggleSaveHadith(hadith) {
             const key = `${hadith.bookId}-${hadith.number}`;
@@ -259,6 +257,8 @@ var app = new Vue({
             this.currentHadithPage = 1;
             this.totalHadiths = 0;
             this.hadithSearchQuery = '';
+            this.showShareOptions = {}; // Reset opsi share saat modal ditutup
+            this.shareText = {}; // Reset teks share saat modal ditutup
         });
     }
 });
